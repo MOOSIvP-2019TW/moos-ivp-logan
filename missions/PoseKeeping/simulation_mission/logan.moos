@@ -26,7 +26,7 @@ ProcessConfig = ANTLER
   Run = pMarineViewer	  @ NewConsole = false
   Run = uProcessWatch	  @ NewConsole = false
   Run = pNodeReporter	  @ NewConsole = false
-  Run = uTimerScript	  @ NewConsole = false
+  //Run = uTimerScript	  @ NewConsole = false
   Run = uXMS		  @ NewConsole = true
   Run = pPoseKeeping	  @ NewConsole = false
 }
@@ -81,12 +81,15 @@ ProcessConfig = uSimMarine
 
   prefix        = NAV
 
-  drift_x       = 0.3
+  //drift_x       = 0.3
   //drift_y       = 0.03
 
   turn_rate     = 40
   thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:5
   thrust_reflect = true
+
+  max_acceleration = 0.0
+  max_deceleration = 0.0
 }
 
 //------------------------------------------
@@ -183,6 +186,18 @@ ProcessConfig = pNodeReporter
 ProcessConfig = uTimerScript  
 {  
   event = var= THRUST_MODE_DIFFERENTIAL, val=true, time=0
+  event = var= DESIRED_THRUST_L, val=20, time=5
+  event = var= DESIRED_THRUST_R, val=20, time=5
+  event = var= DESIRED_THRUST_L, val=-20, time=15
+  event = var= DESIRED_THRUST_R, val=-20, time=15
+  event = var= DESIRED_THRUST_L, val=20, time=25
+  event = var= DESIRED_THRUST_R, val=20, time=25
+  event = var= DESIRED_THRUST_L, val=-20, time=35
+  event = var= DESIRED_THRUST_R, val=-20, time=35
+  event = var= DESIRED_THRUST_L, val=20, time=45
+  event = var= DESIRED_THRUST_R, val=20, time=45
+  event = var= DESIRED_THRUST_L, val=0, time=55
+  event = var= DESIRED_THRUST_R, val=0, time=55
 }
 
 //------------------------------------------

@@ -65,6 +65,8 @@ class PoseKeeping : public AppCastingMOOSApp
    void CheckMode(Data &block);
    void postPolygons();
    std::string DoubleToString(double input);
+   //9.27experiment
+   void CheckValue(double &thrust_r, double &thrust_l);
 
 
  private: // Configuration variables
@@ -89,6 +91,10 @@ class PoseKeeping : public AppCastingMOOSApp
    int m_upper_speed;
    int m_lower_speed;   
    bool m_active;
+   //9.27experiment
+   double m_thruster_back_limit;
+   double m_thruster_forward_limit;
+   double m_tolerance_angle;
 };
 
 #endif 

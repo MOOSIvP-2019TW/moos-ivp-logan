@@ -40,6 +40,10 @@ PoseKeeping::PoseKeeping()
 	m_upper_speed = 100;
 	m_lower_speed = 10;
 	m_active = false;
+	// 9.27experiment
+	m_thruster_back_limit = -33;
+	m_thruster_forward_limit = 17;
+	m_tolerance_angle = 5;
 }
 
 //---------------------------------------------------------
@@ -346,21 +350,87 @@ void PoseKeeping::CalculateError(Data &block, double desired_angle)
 
 void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 {
-
+	double thrust_r,thrust_l;
+	Notify("THRUST",thrust);
+	Notify("SPEED",speed);
 	if (block.m_mode == "KeepHeading")
 	{
-		Notify("DESIRED_THRUST_R",-thrust);
-		Notify("DESIRED_THRUST_L",thrust);
+		if (thrust > 0)
+		{
+			if (thrust < m_tolerance_angle)
+			{
+				thrust_r = 0;
+				thrust_l = 0;
+			}
+			else if (thrust < m_tolerance_angle && thrust < m_thruster_forward_limit)
+			//if (thrust < m_thruster_forward_limit)
+			{
+				thrust_r = -3 * m_thruster_forward_limit;
+				thrust_l = m_thruster_forward_limit;
+			}
+			else if (thrust >= m_thruster_forward_limit && thrust <= 33)
+			{
+				thrust_r = -3 * thrust;
+				thrust_l = thrust;
+			}
+			else if (thrust > 33)
+			{
+				thrust_r = -100;
+				thrust_l = 33;
+			}
+		}
+		else
+		{
+			if (abs(thrust) < m_tolerance_angle)
+			{
+				thrust_r = 0;
+				thrust_l = 0;
+			}
+			else if (abs(thrust) < m_tolerance_angle && abs(thrust) < m_thruster_forward_limit)
+			//if (abs(thrust) < m_thruster_forward_limit)
+			{
+				thrust_r = m_thruster_forward_limit;
+				thrust_l = -3 * m_thruster_forward_limit;
+			}
+			else if (abs(thrust) >= m_thruster_forward_limit && thrust <= 33)
+			{
+				thrust_r = thrust;
+				thrust_l = -3 *thrust;
+			}
+			else if (abs(thrust) > 33)
+			{
+				thrust_r = 33;
+				thrust_l = -100;
+			}
+		}
+		CheckValue(thrust_r,thrust_l);
+		Notify("CURR_MODE",block.m_mode);
+		Notify("DESIRED_THRUST_R",thrust_r);
+		Notify("DESIRED_THRUST_L",thrust_l);
 	}
 	else if (block.m_mode == "Foward")
 	{
-		Notify("DESIRED_THRUST_R",speed - thrust);
-		Notify("DESIRED_THRUST_L",speed + thrust);
+		thrust_r = speed - thrust;
+		thrust_l = speed + thrust;
+		CheckValue(thrust_r,thrust_l);
+		//Notify("DESIRED_THRUST_R",speed - thrust);
+		//Notify("DESIRED_THRUST_L",speed + thrust);
+		Notify("CURR_MODE",block.m_mode);
+		Notify("DESIRED_THRUST_R",thrust_r);
+		Notify("DESIRED_THRUST_L",thrust_l);
 	}
 	else if (block.m_mode == "Backward")
 	{
-		Notify("DESIRED_THRUST_R",-speed + thrust);
-		Notify("DESIRED_THRUST_L",-speed - thrust);
+		//thrust_r = -speed + thrust;
+		//thrust_l = -speed - thrust;
+		thrust_r = -speed + thrust + m_thruster_back_limit;
+		thrust_l = -speed - thrust + m_thruster_back_limit;
+		CheckValue(thrust_r,thrust_l);
+		//Notify("DESIRED_THRUST_R",-speed + thrust);
+		//Notify("DESIRED_THRUST_L",-speed - thrust);
+		Notify("CURR_MODE",block.m_mode);
+		Notify("DESIRED_THRUST_R",thrust_r);
+		Notify("DESIRED_THRUST_L",thrust_l);
 	}
 
 }
@@ -486,6 +556,7 @@ double PoseKeeping::radToDegrees(double radval)
 double PoseKeeping::Distance(double current_x, double current_y, double destination_x, double destination_y)
 {
   double distance = sqrt(pow(current_x-destination_x,2)+pow(current_y-destination_y,2));
+  Notify("DISTANCE",distance);
   return(distance);
 }
 //---------------------------------------------------------------
@@ -554,6 +625,22 @@ string PoseKeeping::DoubleToString(double input)
     msg << input;
     msg >> output;
     return(output);
+}
+//------------------------------------------------------------
+// Procedure: CheckValue
+//   Purpose: Value between -33 to 17 is not acceptable for heron, change it to zero  
+
+void PoseKeeping::CheckValue(double &thrust_r, double &thrust_l)
+{
+	if(thrust_r > m_thruster_back_limit && thrust_r < m_thruster_forward_limit)
+	{
+		thrust_r = 0;
+	}
+
+	if(thrust_l > m_thruster_back_limit && thrust_l < m_thruster_forward_limit)
+	{
+		thrust_l = 0;
+	}
 }
 
 

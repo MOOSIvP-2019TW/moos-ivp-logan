@@ -95,6 +95,7 @@ class PoseKeeping : public AppCastingMOOSApp
    double m_thruster_back_limit;
    double m_thruster_forward_limit;
    double m_tolerance_angle;
+   double m_k;
 };
 
 #endif 

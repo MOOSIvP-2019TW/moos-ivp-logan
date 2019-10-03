@@ -392,8 +392,8 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 			else if (abs(thrust) < m_tolerance_angle && abs(thrust) < m_thruster_forward_limit)
 			//if (abs(thrust) < m_thruster_forward_limit)
 			{
-				thrust_r = m_thruster_forward_limit;
-				thrust_l = -m_k * m_thruster_forward_limit;
+				thrust_r = -m_k * m_thruster_forward_limit;
+				thrust_l = m_thruster_forward_limit;
 			}
 			else if (abs(thrust) >= m_thruster_forward_limit && thrust <= 100.0/m_k)
 			{

@@ -189,11 +189,13 @@ bool PoseKeeping::OnStartUp()
       string y = value;
       m_desired_x = atof(x.c_str());
       m_desired_y = atof(y.c_str());
+      Notify("POSITION", value);
       handled = true;
     }
 
     else if(param == "heading") {
       m_desired_heading = atof(value.c_str());
+      Notify("DESIRED_HEADING", m_desired_heading);
       handled = true;
     }
 

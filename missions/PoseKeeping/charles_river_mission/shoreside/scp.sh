@@ -13,7 +13,7 @@ for ARGI; do
     if [ "${ARGI}" = "--help" -o "${ARGI}" = "-h" ] ; then
         echo " --usr=   ,-u=  , Remote device user name. (Default is $REMOTE_USR)"
         echo " --ip=    ,-i=  , Ip of remote device. (Default is $REMOTE_IP)"
-        echo " --date=  ,-d=  , Date. (Default is $POSITION)"
+        echo " --date=  ,-d=  , Date. (Default is $DATE)"
 	printf "\n"
 	echo "For example: $0 -u=$REMOTE_USR -ip=$REMOTE_IP"
 	exit 0;

@@ -32,6 +32,7 @@ ProcessConfig = ANTLER
 #endif
   Run = uXMS		   @ NewConsole = false
   Run = pPoseKeeping	   @ NewConsole = false
+  //Run = uTimerScript	   @ NewConsole = false
 }
 
 //------------------------------------------
@@ -243,7 +244,36 @@ ProcessConfig = pPoseKeeping
   Kp        = 1.2
   Kd        = 0.0
   Ki        = 0.0
-  tolerance_radius = 5
+  tolerance_radius = 10
+}
+
+//------------------------------------------
+// uTimerScript config block
+ProcessConfig = uTimerScript
+{
+  event = var= THRUST_MODE_DIFFERENTIAL, val=true, time=0
+  event = var= DESIRED_THRUST_L, val=25, time=0
+  event =  var=DESIRED_THRUST_R, val=25, time=0
+  event =  var=DESIRED_THRUST_L, val=-60, time=10
+  event =  var=DESIRED_THRUST_R, val=-60, time=10
+  event =  var=DESIRED_THRUST_L, val=25, time=20
+  event =  var=DESIRED_THRUST_R, val=25, time=20
+
+  event =  var=DESIRED_THRUST_L, val=-60, time=30
+  event =  var=DESIRED_THRUST_R, val=-60, time=30
+  event =  var=DESIRED_THRUST_L, val=25, time=40
+  event =  var=DESIRED_THRUST_R, val=25, time=40
+
+  event =  var=DESIRED_THRUST_L, val=-60, time=50
+  event =  var=DESIRED_THRUST_R, val=-60, time=50
+  event =  var=DESIRED_THRUST_L, val=25, time=60
+  event =  var=DESIRED_THRUST_R, val=25, time=60
+
+  event =  var=DESIRED_THRUST_L, val=-60, time=70
+  event =  var=DESIRED_THRUST_R, val=-60, time=70
+  event =  var=DESIRED_THRUST_L, val=25, time=80
+  event =  var=DESIRED_THRUST_R, val=25, time=80
+  reset_time = all-posted
 }
 
 

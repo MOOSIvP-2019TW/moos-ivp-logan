@@ -43,7 +43,7 @@ PoseKeeping::PoseKeeping()
 	// 9.27experiment
 	m_thruster_back_limit = -33;
 	m_thruster_forward_limit = 17;
-	m_tolerance_angle = 5;
+	m_tolerance_angle = 0;
 	m_k = 3;
 }
 
@@ -416,8 +416,8 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 		thrust_r = speed - thrust;
 		thrust_l = speed + thrust;
 		CheckValue(thrust_r,thrust_l);
-		//Notify("DESIRED_THRUST_R",speed - thrust);
-		//Notify("DESIRED_THRUST_L",speed + thrust);
+		//Notify("DESIRED_THRUST_R",speed - thrust + m_thruster_forward_limit);
+		//Notify("DESIRED_THRUST_L",speed + thrust + m_thruster_forward_limit);
 		Notify("CURR_MODE",block.m_mode);
 		Notify("DESIRED_THRUST_R",thrust_r);
 		Notify("DESIRED_THRUST_L",thrust_l);

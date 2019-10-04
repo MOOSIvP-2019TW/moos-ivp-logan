@@ -41,10 +41,10 @@ PoseKeeping::PoseKeeping()
 	m_lower_speed = 10;
 	m_active = false;
 	// 9.27experiment
-	m_thruster_back_limit = 0;//-33
-	m_thruster_forward_limit = 0;//17
-	m_tolerance_angle = 0;
-	m_k = 1;
+	m_thruster_back_limit = -33;
+	m_thruster_forward_limit = 17;
+	m_tolerance_angle = 5;
+	m_k = 3;
 }
 
 //---------------------------------------------------------
@@ -185,11 +185,11 @@ bool PoseKeeping::OnStartUp()
 
     else if(param == "position") {
       value = stripQuotes(value);
+      Notify("POSITION", value);
       string x = biteString(value, ',');
       string y = value;
       m_desired_x = atof(x.c_str());
       m_desired_y = atof(y.c_str());
-      Notify("POSITION", value);
       handled = true;
     }
 
@@ -238,7 +238,7 @@ void PoseKeeping::registerVariables()
      Register("NAV_HEADING", 0);
      Register("NAV_X", 0);
      Register("NAV_Y", 0);
-     Register("THRUST_MODE_DIFFERENTIAL",0 );
+     Register("THRUST_MODE_DIFFERENTIAL",0);
 }
 
 
@@ -365,7 +365,7 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 				thrust_r = 0;
 				thrust_l = 0;
 			}
-			else if (thrust < m_tolerance_angle && thrust < m_thruster_forward_limit)
+			else if (thrust > m_tolerance_angle && thrust < m_thruster_forward_limit)
 			//if (thrust < m_thruster_forward_limit)
 			{
 				thrust_r = -m_k * m_thruster_forward_limit;
@@ -386,19 +386,19 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 		{
 			if (abs(thrust) < m_tolerance_angle)
 			{
-				thrust_r = 0;
 				thrust_l = 0;
+				thrust_r = 0;
 			}
-			else if (abs(thrust) < m_tolerance_angle && abs(thrust) < m_thruster_forward_limit)
+			else if (abs(thrust) > m_tolerance_angle && abs(thrust) < m_thruster_forward_limit)
 			//if (abs(thrust) < m_thruster_forward_limit)
 			{
-				thrust_r = -m_k * m_thruster_forward_limit;
-				thrust_l = m_thruster_forward_limit;
+				thrust_r = m_thruster_forward_limit;
+				thrust_l = -m_k * m_thruster_forward_limit;
 			}
 			else if (abs(thrust) >= m_thruster_forward_limit && thrust <= 100.0/m_k)
 			{
-				thrust_r = thrust;
-				thrust_l = -m_k *thrust;
+				thrust_l = thrust;
+				thrust_r = -m_k *thrust;
 			}
 			else if (abs(thrust) > 100.0/m_k)
 			{
@@ -426,8 +426,8 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 	{
 		//thrust_r = -speed + thrust;
 		//thrust_l = -speed - thrust;
-		thrust_r = -speed + thrust;// + m_thruster_back_limit;
-		thrust_l = -speed - thrust;// + m_thruster_back_limit;
+		thrust_r = -speed + thrust + m_thruster_back_limit;
+		thrust_l = -speed - thrust + m_thruster_back_limit;
 		CheckValue(thrust_r,thrust_l);
 		//Notify("DESIRED_THRUST_R",-speed + thrust);
 		//Notify("DESIRED_THRUST_L",-speed - thrust);

@@ -189,7 +189,7 @@ ProcessConfig = uSimMarine
 
   prefix        = NAV
 
-  drift_x       = 0.3
+  //drift_x       = 0.3
   //drift_y       = 0.03
 
   turn_rate     = 40

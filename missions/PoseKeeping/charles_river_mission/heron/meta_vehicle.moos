@@ -219,7 +219,7 @@ ProcessConfig = iM200
   MAX_RUDDER     = 100.0        // Rudder value will be capped to this, +/-
   MAX_THRUST     = 100.0        // Thrust value to each motor will be
                                // capped to this value, +/-
-  PUBLISH_THRUST = true
+  PUBLISH_THRUST = false
 }
 
 //------------------------------------------
@@ -228,8 +228,9 @@ ProcessConfig = uXMS
 {
   AppTick   = 4                                                 
   CommsTick = 4
-  var = DESIRED_THRUST_R, DESIRED_THRUST_L, THRUST_MODE_DIFFERENTIAL, DISTANCE, CURR_MODE, SPEED, THRUST, POSITION, DESIRED_HEADING
+  var = DESIRED_THRUST_R, DESIRED_THRUST_L, THRUST_MODE_DIFFERENTIAL, DISTANCE, CURR_MODE, SPEED, THRUST, POSITION, DESIRED_HEADING, NAV_HEADING
   history_var = DESIRED_THRUST_R
+  display_time = true
 }
 
 //------------------------------------------

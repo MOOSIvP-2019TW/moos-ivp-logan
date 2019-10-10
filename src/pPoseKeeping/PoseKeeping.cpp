@@ -360,7 +360,7 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 	{
 		if (thrust > 0)
 		{
-			if (thrust < m_tolerance_angle)
+			/*if (thrust < m_tolerance_angle)
 			{
 				thrust_r = 0;
 				thrust_l = 0;
@@ -380,11 +380,13 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 			{
 				thrust_r = -100;
 				thrust_l = 100.0/m_k;
-			}
+			}*/
+			thrust_l =  18;
+			thrust_r = -54;
 		}
 		else
 		{
-			if (abs(thrust) < m_tolerance_angle)
+			/*if (abs(thrust) < m_tolerance_angle)
 			{
 				thrust_l = 0;
 				thrust_r = 0;
@@ -404,7 +406,9 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 			{
 				thrust_r = 100.0/m_k;
 				thrust_l = -100;
-			}
+			}*/
+			thrust_r =  18;
+			thrust_l = -54;
 		}
 		CheckValue(thrust_r,thrust_l);
 		Notify("CURR_MODE",block.m_mode);
@@ -413,8 +417,8 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 	}
 	else if (block.m_mode == "Foward")
 	{
-		thrust_r = speed - thrust;
-		thrust_l = speed + thrust;
+		thrust_r = speed - thrust + m_thruster_forward_limit;
+		thrust_l = speed + thrust + m_thruster_forward_limit;
 		CheckValue(thrust_r,thrust_l);
 		//Notify("DESIRED_THRUST_R",speed - thrust + m_thruster_forward_limit);
 		//Notify("DESIRED_THRUST_L",speed + thrust + m_thruster_forward_limit);

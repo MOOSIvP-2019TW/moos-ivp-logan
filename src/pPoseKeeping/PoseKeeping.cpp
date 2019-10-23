@@ -331,13 +331,15 @@ void PoseKeeping::CalculateError(Data &block, double desired_angle)
 	//Keep going if this is set_point mode
 	if(error < 180 && error > 90 && block.m_curr_distance < m_tolerance_radius+10)
 	{
-		error = -error+180;
-		block.m_mode = "Backward";
+		//error = -error+180;
+		//block.m_mode = "Backward";
+		block.m_mode = "Foward";
 	}
 	else if(error < -90 && error > -180 && block.m_curr_distance < m_tolerance_radius+10)
 	{
-		error = -error-180;
-		block.m_mode = "Backward";
+		//error = -error-180;
+		//block.m_mode = "Backward";
+		block.m_mode = "Foward";
 	}
 	else
 	{
@@ -413,8 +415,8 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 	}
 	else if (block.m_mode == "Foward")
 	{
-		thrust_r = speed - thrust;
-		thrust_l = speed + thrust;
+		thrust_r = speed - thrust + m_thruster_forward_limit;
+		thrust_l = speed + thrust + m_thruster_forward_limit;
 		CheckValue(thrust_r,thrust_l);
 		//Notify("DESIRED_THRUST_R",speed - thrust);
 		//Notify("DESIRED_THRUST_L",speed + thrust);

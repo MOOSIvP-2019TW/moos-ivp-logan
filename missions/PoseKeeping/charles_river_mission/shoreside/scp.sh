@@ -3,8 +3,8 @@
 #  Part 1: Initial value
 #-------------------------------------------------------
 REMOTE_USR=student2680
-REMOTE_IP=192.168.6.100
-DATE=04.10.2019
+REMOTE_IP=192.168.6.100 #192.168.6.100
+DATE=10.21.2019
 
 #-------------------------------------------------------
 #  Part 2: Check for and handle command-line arguments

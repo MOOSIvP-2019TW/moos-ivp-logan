@@ -9,6 +9,9 @@
 #include "MBUtils.h"
 #include "ACTable.h"
 #include "PoseKeeping.h"
+// 10.21experiment
+#include "XYVector.h"
+#include "ColorPack.cpp"
 
 #ifndef M_PI
 #define M_PI 3.1415926
@@ -45,6 +48,8 @@ PoseKeeping::PoseKeeping()
 	m_thruster_forward_limit = 17;
 	m_tolerance_angle = 5;
 	m_k = 3;
+	// 10.21experiment
+	m_pre_heading = -1;
 }
 
 //---------------------------------------------------------
@@ -81,7 +86,7 @@ bool PoseKeeping::OnNewMail(MOOSMSG_LIST &NewMail)
      if(key == "FOO") 
        cout << "great!";
 
-     else if(key == "NAV_HEADING")
+     else if(key == "NAV_HEADING_CPNVG") //_CPNVG
      {
 	m_nav_heading = dval; 
      }
@@ -137,6 +142,21 @@ bool PoseKeeping::Iterate()
   if(!m_active)
     return(false);
 
+  // ShowCompassHeading on
+  ShowCompassHeading();
+
+///* Filter feature
+  // CheckCompassHeading
+  if(m_pre_heading == -1){}
+  else
+  {
+	if(abs(m_nav_heading - m_pre_heading > 120)) // from logfile data result
+	{
+		return(false);
+	}
+  }
+//*/
+
   // Behavior
   // If vehicle reach destination, KeepHeading mode On
   if(Distance(m_osx, m_osy, m_desired_x, m_desired_y) < m_arrival_radius)
@@ -150,6 +170,10 @@ bool PoseKeeping::Iterate()
   else
     SetPoint();
 
+///* Filter feature
+  // save m_nav_heading to m_pre_heading
+  m_pre_heading = m_nav_heading; 
+//*/
 
   AppCastingMOOSApp::PostReport();
   return(true);
@@ -235,10 +259,11 @@ void PoseKeeping::registerVariables()
 {
   AppCastingMOOSApp::RegisterVariables();
   // Register("FOOBAR", 0);
-     Register("NAV_HEADING", 0);
+     //Register("NAV_HEADING", 0); //
      Register("NAV_X", 0);
      Register("NAV_Y", 0);
      Register("THRUST_MODE_DIFFERENTIAL",0);
+     Register("NAV_HEADING_CPNVG");
 }
 
 
@@ -646,6 +671,23 @@ void PoseKeeping::CheckValue(double &thrust_r, double &thrust_l)
 	{
 		thrust_l = 0;
 	}
+}
+//------------------------------------------------------------
+// Procedure: ShowCompassHeading
+//   Purpose: Using VIEW_VECTOR to show compass heading on pMarineViewer
+
+void PoseKeeping::ShowCompassHeading()
+{
+	XYVector vector(m_osx, m_osy, 5, m_nav_heading);
+	//vector.set_active(active);
+	vector.set_label("COMPASS_HEADING");
+	//vector.set_color("fill", "orange");
+	vector.set_vertex_size(5);
+	vector.set_edge_size(5);
+	vector.set_edge_color("green");
+	vector.setHeadSize(2);
+	string str = vector.get_spec();
+	m_Comms.Notify("VIEW_VECTOR", str);
 }
 
 

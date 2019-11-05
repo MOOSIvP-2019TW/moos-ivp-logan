@@ -32,6 +32,7 @@ ProcessConfig = ANTLER
 #endif
   Run = uXMS		   @ NewConsole = false
   Run = pPoseKeeping	   @ NewConsole = false
+  //Run = uTimerScript    @ NewConsole = false
 }
 
 //------------------------------------------
@@ -169,6 +170,8 @@ ProcessConfig = uFldNodeBroker
   BRIDGE = src=VIEW_POINT
   BRIDGE = src=VIEW_SEGLIST
   BRIDGE = src=VIEW_CIRCLE
+  //2019.10.21
+  BRIDGE = src=VIEW_VECTOR
   BRIDGE = src=APPCAST
   BRIDGE = src=NODE_REPORT_LOCAL,  alias=NODE_REPORT
   BRIDGE = src=NODE_MESSAGE_LOCAL, alias=NODE_MESSAGE
@@ -227,7 +230,7 @@ ProcessConfig = uXMS
 {
   AppTick   = 4                                                 
   CommsTick = 4
-  var = DESIRED_THRUST_R, DESIRED_THRUST_L, THRUST_MODE_DIFFERENTIAL, DISTANCE, CURR_MODE, SPEED, THRUST, POSITION, DESIRED_HEADING
+  var = DESIRED_THRUST_R, DESIRED_THRUST_L, THRUST_MODE_DIFFERENTIAL, DISTANCE, CURR_MODE, SPEED, THRUST, POSITION, DESIRED_HEADING, NAV_HEADING, NAV_HEADING_CPNVG
   history_var = DESIRED_THRUST_R
 }
 

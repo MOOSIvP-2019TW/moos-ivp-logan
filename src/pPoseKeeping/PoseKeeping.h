@@ -68,6 +68,9 @@ class PoseKeeping : public AppCastingMOOSApp
    //9.27experiment
    void CheckValue(double &thrust_r, double &thrust_l);
 
+   //10.21experiment
+   void ShowCompassHeading();
+
 
  private: // Configuration variables
    double m_desired_heading;
@@ -96,6 +99,8 @@ class PoseKeeping : public AppCastingMOOSApp
    double m_thruster_forward_limit;
    double m_tolerance_angle;
    double m_k;
+   //10.21experiment
+   double m_pre_heading;
 };
 
 #endif 

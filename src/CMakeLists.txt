@@ -27,6 +27,8 @@ ADD_SUBDIRECTORY(uFldHazardMgrX)
 ADD_SUBDIRECTORY(pAngleDecision)
 ADD_SUBDIRECTORY(pPoseKeeping)
 #ADD_SUBDIRECTORY(pFFT_test)
+#ADD_SUBDIRECTORY(iM200X)
+ADD_SUBDIRECTORY(ptesting)
 
 ##############################################################################
 #                           END of CMakeLists.txt

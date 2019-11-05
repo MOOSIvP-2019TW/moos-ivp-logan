@@ -46,7 +46,7 @@ PoseKeeping::PoseKeeping()
 	// 9.27experiment
 	m_thruster_back_limit = -33;
 	m_thruster_forward_limit = 17;
-	m_tolerance_angle = 5;
+	m_tolerance_angle = 0;
 	m_k = 3;
 	// 10.21experiment
 	m_pre_heading = -1;

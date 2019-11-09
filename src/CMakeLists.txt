@@ -29,6 +29,8 @@ ADD_SUBDIRECTORY(pPoseKeeping)
 #ADD_SUBDIRECTORY(pFFT_test)
 #ADD_SUBDIRECTORY(iM200X)
 ADD_SUBDIRECTORY(ptesting)
+ADD_SUBDIRECTORY(uSimMarineX)
+ADD_SUBDIRECTORY(uSimMarineX_HWGR)
 
 ##############################################################################
 #                           END of CMakeLists.txt

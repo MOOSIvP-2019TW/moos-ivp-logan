@@ -1,0 +1,85 @@
+//------------------------------------------------
+// File: charlie.bhv
+// Name: M. Benjamin
+// Date: Jan 2nd, 2010
+//------------------------------------------------
+
+initialize   DEPLOY=false,  RETURN  = false
+initialize   LOITER=true,   STATION_KEEP = false
+
+set MODE = ACTIVE {
+  DEPLOY = true
+} INACTIVE
+
+set MODE = LOITERING {
+  MODE = ACTIVE
+  (LOITER = true) and (RETURN != true)
+  STATION_KEEP != true
+}
+
+set MODE = RETURNING {
+  MODE = ACTIVE
+  RETURN = true
+  STATION_KEEP != true
+} STATION-KEEPING
+
+//----------------------------------------------
+Behavior = BHV_Waypoint
+{
+  name      = waypt_survey
+  priority  = 100
+  condition = MODE==LOITERING
+
+  updates    = WPT_UPDATE
+  perpetual  = true
+
+//                lead = 8
+//         lead_damper = 1
+//       lead_to_start = true
+               speed = 12   // meters per second
+        capture_line = true
+      capture_radius = 15.0
+         slip_radius = 15.0
+	efficiency_measure = all
+
+             polygon = 0,-150: 100,-150
+
+               order = normal
+             repeat  = 1
+
+    visual_hints = nextpt_color=yellow
+    visual_hints = nextpt_vertex_size=8
+    visual_hints = nextpt_lcolor=gray70
+    visual_hints = vertex_color=dodger_blue, edge_color=white
+    visual_hints = vertex_size=5, edge_size=1
+}
+
+//----------------------------------------------
+Behavior = BHV_Waypoint
+{
+  name      = waypt_return
+  priority  = 100
+  perpetual = true
+  updates   = RETURN_UPDATES
+  condition = MODE==RETURNING
+  endflag   = STATION_KEEP = true
+
+      speed = 1.3
+     radius = 3.0
+  nm_radius = 15.0
+      point = x=15, y=0
+}
+
+//----------------------------------------------
+Behavior = BHV_StationKeep
+{
+  name      = station-keep
+  priority  = 100
+  condition = MODE==STATION-KEEPING
+
+  center_activate = true 
+     inner_radius = 5 
+     outer_radius = 10  
+      outer_speed = 1.0
+       swing_time = 10
+}

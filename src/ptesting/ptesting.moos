@@ -1,0 +1,9 @@
+//------------------------------------------------
+// ptesting config block
+
+ProcessConfig = ptesting
+{
+   AppTick   = 4
+   CommsTick = 4
+}
+

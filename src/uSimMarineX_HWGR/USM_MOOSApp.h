@@ -54,7 +54,8 @@ public:
   void cacheStartingInfo();
   // logan HWGR
   void postNodeRecordUpdate_without_heading(std::string, const NodeRecord&);
-  
+  void postNodeRecordUpdate_wrong_heading_state(std::string, const NodeRecord&, const NodeRecord&);
+
   std::string handleConfigDeprecations(std::string);
 
 protected:

@@ -132,8 +132,8 @@ ProcessConfig = uTimerScript
   randvar = varname=ANG, min=0,   max=359, key=at_reset
   randvar = varname=MAG, min=1.5, max=3.5, key=at_reset
 
-  event = var=DRIFT_VECTOR_ADD, val="90,{$(MAG)*0.2}", time=10
-  event = var=DRIFT_VECTOR_ADD, val="180,{$(MAG)*0.2}", time=15
+  //event = var=DRIFT_VECTOR_ADD, val="90,{$(MAG)*0.2}", time=10
+  //event = var=DRIFT_VECTOR_ADD, val="180,{$(MAG)*0.2}", time=15
 }
 
 //------------------------------------------

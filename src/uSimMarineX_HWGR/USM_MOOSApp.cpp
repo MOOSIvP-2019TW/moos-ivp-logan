@@ -518,9 +518,11 @@ bool USM_MOOSApp::Iterate()
 
   else if(m_model.usingDualState() && m_model.usingWrongHeadingState() && !m_model.usingDriftState()) {
     // New function
-    Notify("NAV_HEADING", record.getHeading());
     postNodeRecordUpdate(m_sim_prefix+"_GT", record_gt);
-    postNodeRecordUpdate_without_heading(m_sim_prefix, record_gt); 
+    Notify("NAV_HEADING", record.getHeading());
+    postNodeRecordUpdate_without_heading(m_sim_prefix, record_gt);
+    //postNodeRecordUpdate_wrong_heading_state(m_sim_prefix, record, record_gt);
+    
   }
   else {
     postNodeRecordUpdate(m_sim_prefix, record);
@@ -928,6 +930,58 @@ void USM_MOOSApp::postNodeRecordUpdate_without_heading(string prefix,
   
 }
 
+//------------------------------------------------------------------------
+// Procedure: postNodeRecordUpdate_without_heading
+// Notify every variables in record_gt as "NAV_", only notify "NAV_HEADING" from record
+
+void USM_MOOSApp::postNodeRecordUpdate_wrong_heading_state(string prefix, 
+				       			   const NodeRecord &record,
+							   const NodeRecord &record_gt)
+{
+  double nav_x = record_gt.getX(); // change every record to record_gt in this function
+  double nav_y = record_gt.getY(); 
+
+  Notify(prefix+"_X", nav_x, m_curr_time);
+  Notify(prefix+"_Y", nav_y, m_curr_time);
+
+  if(m_geo_ok) {
+    double lat, lon;
+#ifdef USE_UTM
+    m_geodesy.UTM2LatLong(nav_x, nav_y, lat, lon);
+#else
+    m_geodesy.LocalGrid2LatLong(nav_x, nav_y, lat, lon);
+#endif
+    Notify(prefix+"_LAT", lat, m_curr_time);
+    Notify(prefix+"_LONG", lon, m_curr_time);
+  }
+
+  double new_speed = record_gt.getSpeed();
+  new_speed = snapToStep(new_speed, 0.01);
+
+  Notify(prefix+"_HEADING", record_gt.getHeading(), m_curr_time);
+
+  Notify(prefix+"_SPEED", new_speed, m_curr_time);
+  Notify(prefix+"_DEPTH", record_gt.getDepth(), m_curr_time);
+
+  // Added by HS 120124 to make it work ok with iHuxley
+  Notify("SIMULATION_MODE","TRUE", m_curr_time);
+  Notify(prefix+"_Z", -record_gt.getDepth(), m_curr_time);
+  Notify(prefix+"_PITCH", record_gt.getPitch(), m_curr_time);
+  Notify(prefix+"_YAW", record_gt.getYaw(), m_curr_time);
+  Notify("TRUE_X", nav_x, m_curr_time);
+  Notify("TRUE_Y", nav_y, m_curr_time);
+
+
+  double hog = angle360(record_gt.getHeadingOG());
+  double sog = record_gt.getSpeedOG();
+
+  Notify(prefix+"_HEADING_OVER_GROUND", hog, m_curr_time);
+  Notify(prefix+"_SPEED_OVER_GROUND", sog, m_curr_time);
+  
+  if(record_gt.isSetAltitude()) 
+    Notify(prefix+"_ALTITUDE", record_gt.getAltitude(), m_curr_time);
+  
+}
 
 
 

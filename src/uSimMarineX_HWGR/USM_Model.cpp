@@ -454,7 +454,7 @@ bool USM_Model::initPosition(const string& str)
 void USM_Model::propagateNodeRecord(NodeRecord& record, 
 				    double delta_time, 
 				    bool apply_external_forces,
-				    bool apply_error_heading)  // logan
+				    bool apply_error_heading)  // logan // If apply_error_heading = true, add error to current heading.
 {
   double prior_spd = record.getSpeed();
   double prior_hdg = record.getHeading();
@@ -507,7 +507,7 @@ void USM_Model::propagateNodeRecord(NodeRecord& record,
   }
 
   // logan
-  if(apply_error_heading){
+  if(apply_error_heading){       // add m_heading_error to current heading, and set m_heading_error back to zero
     double heading = record.getHeading();
     heading += m_heading_error;
     record.setHeading(heading);

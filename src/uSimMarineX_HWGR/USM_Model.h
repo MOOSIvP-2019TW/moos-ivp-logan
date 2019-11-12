@@ -64,8 +64,8 @@ public:
   bool   initPosition(const std::string&);
   bool   addThrustMapping(double, double);
 
-  // logan
-  void   setHeadingError(double v)    {m_heading_error = v;}
+  // logan add setters
+  void   setHeadingError(double v)    {m_heading_error = v;} 
   void   setWrongHeadingState(bool v) {m_wrong_heading_state = v;} 
   void   setDriftState(bool v) {m_drift_state = v;} 
 
@@ -98,7 +98,7 @@ public:
   std::string getDriftSummary();
   std::string getThrustModeDiff() const {return(m_thrust_mode);}
 
-  // logan
+  // logan add getters
   double     getHeadingError()const {return(m_heading_error);}
   bool       usingWrongHeadingState() const  {return(m_wrong_heading_state);}
   bool       usingDriftState() const  {return(m_drift_state);}
@@ -106,7 +106,7 @@ public:
 
   // logan
   //void   propagateNodeRecord(NodeRecord&, double delta_time, bool);
-  void   propagateNodeRecord(NodeRecord&, double delta_time, bool, bool);
+  void   propagateNodeRecord(NodeRecord&, double delta_time, bool, bool);  // add one more input to decide apply error heading or not
 
  protected:
   double     m_rudder;

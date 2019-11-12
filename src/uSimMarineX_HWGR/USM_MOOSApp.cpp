@@ -139,7 +139,7 @@ bool USM_MOOSApp::OnNewMail(MOOSMSG_LIST &NewMail)
       m_srcs_drift.insert(msg.GetSource());
       m_model.setDriftVector(sval, true);
       // logan
-      m_model.setDriftState(true);
+      m_model.setDriftState(true);  // add m_drift_state in Class USM_Model, use to decide how to Notify the data in USM_Model::m_record and USM_Model::m_record_gt later
     }
 
     else if((key == "USM_FORCE_VECTOR_MULT") || // Deprecated
@@ -186,9 +186,9 @@ bool USM_MOOSApp::OnNewMail(MOOSMSG_LIST &NewMail)
     }
 
     // logan
-    else if(key == "HEADING_ERROR_ADD") {
-      m_model.setHeadingError(dval);
-      m_model.setWrongHeadingState(true);
+    else if(key == "HEADING_ERROR_ADD") {  // new MOOS variable that uSimMarine subscribe
+      m_model.setHeadingError(dval);       // set USM_Model::m_heading_error = dval
+      m_model.setWrongHeadingState(true);  // set USM_Model::m_wrong_heading_state = true, also for deciding how to Notify the data later
     }
 
 
@@ -310,6 +310,12 @@ bool USM_MOOSApp::OnStartUp()
     }
     else if((param == "MAX_TRIM_DELAY") && isNumber(value)) {
       max_trim_delay = dval; 
+      handled = true;
+    }
+    // logan
+    else if((param == "HEADING_ERROR") && isNumber(value)) { // User can also set constant heading error in uSimMarine config block
+      m_model.setHeadingError(dval);                         // set USM_Model::m_heading_error = dval
+      m_model.setWrongHeadingState(true);                    // set USM_Model::m_wrong_heading_state = true, also for deciding how to Notify the data later
       handled = true;
     }
         
@@ -509,7 +515,7 @@ bool USM_MOOSApp::Iterate()
   }
   
   // logan 
-  //==========================================================================
+  //========================================================================== Decide how to notify depends on which mode it currently is(Take a look at "HI_MIKE_PLZ_README.txt" for more details about mode!)
   NodeRecord record_gt = m_model.getNodeRecordGT();
 
   if(!m_model.usingDualState()) {
@@ -517,12 +523,8 @@ bool USM_MOOSApp::Iterate()
   }
 
   else if(m_model.usingDualState() && m_model.usingWrongHeadingState() && !m_model.usingDriftState()) {
-    // New function
     postNodeRecordUpdate(m_sim_prefix+"_GT", record_gt);
-    Notify("NAV_HEADING", record.getHeading());
-    postNodeRecordUpdate_without_heading(m_sim_prefix, record_gt);
-    //postNodeRecordUpdate_wrong_heading_state(m_sim_prefix, record, record_gt);
-    
+    postNodeRecordUpdate_wrong_heading_state(m_sim_prefix, record, record_gt);    
   }
   else {
     postNodeRecordUpdate(m_sim_prefix, record);
@@ -874,65 +876,11 @@ bool USM_MOOSApp::buildReport()
 }
 
 
-//==============================================================================
-// Logan
-//==============================================================================
 
+// logan
 //------------------------------------------------------------------------
-// Procedure: postNodeRecordUpdate_without_heading
-
-void USM_MOOSApp::postNodeRecordUpdate_without_heading(string prefix, 
-				       const NodeRecord &record)
-{
-  double nav_x = record.getX();
-  double nav_y = record.getY();
-
-  Notify(prefix+"_X", nav_x, m_curr_time);
-  Notify(prefix+"_Y", nav_y, m_curr_time);
-
-  if(m_geo_ok) {
-    double lat, lon;
-#ifdef USE_UTM
-    m_geodesy.UTM2LatLong(nav_x, nav_y, lat, lon);
-#else
-    m_geodesy.LocalGrid2LatLong(nav_x, nav_y, lat, lon);
-#endif
-    Notify(prefix+"_LAT", lat, m_curr_time);
-    Notify(prefix+"_LONG", lon, m_curr_time);
-  }
-
-  double new_speed = record.getSpeed();
-  new_speed = snapToStep(new_speed, 0.01);
-
-  // logan HWGR
-  //Notify(prefix+"_HEADING", record.getHeading(), m_curr_time);
-
-  Notify(prefix+"_SPEED", new_speed, m_curr_time);
-  Notify(prefix+"_DEPTH", record.getDepth(), m_curr_time);
-
-  // Added by HS 120124 to make it work ok with iHuxley
-  Notify("SIMULATION_MODE","TRUE", m_curr_time);
-  Notify(prefix+"_Z", -record.getDepth(), m_curr_time);
-  Notify(prefix+"_PITCH", record.getPitch(), m_curr_time);
-  Notify(prefix+"_YAW", record.getYaw(), m_curr_time);
-  Notify("TRUE_X", nav_x, m_curr_time);
-  Notify("TRUE_Y", nav_y, m_curr_time);
-
-
-  double hog = angle360(record.getHeadingOG());
-  double sog = record.getSpeedOG();
-
-  Notify(prefix+"_HEADING_OVER_GROUND", hog, m_curr_time);
-  Notify(prefix+"_SPEED_OVER_GROUND", sog, m_curr_time);
-  
-  if(record.isSetAltitude()) 
-    Notify(prefix+"_ALTITUDE", record.getAltitude(), m_curr_time);
-  
-}
-
-//------------------------------------------------------------------------
-// Procedure: postNodeRecordUpdate_without_heading
-// Notify every variables in record_gt as "NAV_", only notify "NAV_HEADING" from record
+// Procedure: postNodeRecordUpdate_wrong_heading_state
+// Notify every variables in record_gt as "NAV_", only notify "NAV_HEADING" from record (This function only for Case 6: dual_state on, drift_state off, wrong_heading_state on)
 
 void USM_MOOSApp::postNodeRecordUpdate_wrong_heading_state(string prefix, 
 				       			   const NodeRecord &record,
@@ -958,10 +906,11 @@ void USM_MOOSApp::postNodeRecordUpdate_wrong_heading_state(string prefix,
   double new_speed = record_gt.getSpeed();
   new_speed = snapToStep(new_speed, 0.01);
 
-  Notify(prefix+"_HEADING", record_gt.getHeading(), m_curr_time);
-
+  // logan
   Notify(prefix+"_SPEED", new_speed, m_curr_time);
-  Notify(prefix+"_DEPTH", record_gt.getDepth(), m_curr_time);
+  Notify(prefix+"_HEADING", record.getHeading());              // Hi Mike, I have a question here! If I notify record.getHeading() without giving m_curr_time, Case 6 mode will work perfectly
+  Notify(prefix+"_DEPTH", record_gt.getDepth(), m_curr_time);  // But if I notify record.getHeading() with m_curr_time, like "Notify(prefix+"_HEADING", record.getHeading(), m_curr_time);",
+                                                               // the result will be different. I've been thinking for a while but still can't figure out. 
 
   // Added by HS 120124 to make it work ok with iHuxley
   Notify("SIMULATION_MODE","TRUE", m_curr_time);
@@ -980,9 +929,5 @@ void USM_MOOSApp::postNodeRecordUpdate_wrong_heading_state(string prefix,
   
   if(record_gt.isSetAltitude()) 
     Notify(prefix+"_ALTITUDE", record_gt.getAltitude(), m_curr_time);
-  
 }
-
-
-
 

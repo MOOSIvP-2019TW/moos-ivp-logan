@@ -25,6 +25,7 @@ ProcessConfig = ANTLER
   Run = pHelmIvP        @ NewConsole = false
   Run = pLogger         @ NewConsole = false
   Run = uTimerScript    @ NewConsole = false
+  Run = uXMS		@ NewConsole = true
 }
 
 //------------------------------------------
@@ -58,6 +59,7 @@ ProcessConfig = uSimMarineX_HWGR
   max_deceleration  = 0.1
 
   dual_state    = true
+  heading_error = 0
 }
 
 //------------------------------------------
@@ -183,4 +185,15 @@ ProcessConfig = pMarineViewer
   button_three = SKEEP:true  # STATION_KEEP=true
   button_four  = SKEEP:false # STATION_KEEP=false
 }
+
+//------------------------------------------
+// uXMS config block
+ProcessConfig = uXMS 
+{
+  AppTick   = 4                                                 
+  CommsTick = 4
+  var = HI
+  history_var = HI
+}
+
 

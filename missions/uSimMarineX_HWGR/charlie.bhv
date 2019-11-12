@@ -11,7 +11,7 @@ set MODE = ACTIVE {
   DEPLOY = true
 } INACTIVE
 
-set MODE = LOITERING {
+set MODE = SURVEYING {
   MODE = ACTIVE
   (LOITER = true) and (RETURN != true)
   STATION_KEEP != true
@@ -28,7 +28,7 @@ Behavior = BHV_Waypoint
 {
   name      = waypt_survey
   priority  = 100
-  condition = MODE==LOITERING
+  condition = MODE==SURVEYING
 
   updates    = WPT_UPDATE
   perpetual  = true
@@ -37,12 +37,12 @@ Behavior = BHV_Waypoint
 //         lead_damper = 1
 //       lead_to_start = true
                speed = 12   // meters per second
-        capture_line = true
+        capture_line = false
       capture_radius = 15.0
          slip_radius = 15.0
 	efficiency_measure = all
 
-             polygon = 0,-150: 100,-150
+             polygon = 0,-50: 0,-150: 100,-150: 100,-50: 0,-50 //100,-150: 100,-50:
 
                order = normal
              repeat  = 1

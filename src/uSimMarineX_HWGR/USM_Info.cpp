@@ -116,6 +116,8 @@ void showExampleConfigAndExit()
   blk("  thrust_map           = 0:0, 20:1, 40:2, 60:3, 80:5, 100:5     ");
   blk("                                                                ");
   blk("  prefix               = NAV_  ","// default is USM_            ");
+  blk("                                                                "); //logan
+  blk("  heading_error        = 0                                      "); //logan
   blk("}                                                               ");
   blk("                                                                ");
   exit(0);
@@ -160,6 +162,8 @@ void showInterfaceAndExit()
   blk("                                                                ");
   blk("  USM_RESET            (value not read)                         ");
   blk("  USM_SIM_PAUSED     = [true/false]                             ");
+  blk("                                                                "); //logan
+  blk("  HEADING_ERROR_ADD  = [-inf,+inf]                              "); //logan
   blk("                                                                ");
   blk("PUBLICATIONS:                                                   ");
   blk("------------------------------------                            ");

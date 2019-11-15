@@ -25,7 +25,6 @@ ProcessConfig = ANTLER
   Run = pHelmIvP        @ NewConsole = false
   Run = pLogger         @ NewConsole = false
   Run = uTimerScript    @ NewConsole = false
-  Run = uXMS		@ NewConsole = true
 }
 
 //------------------------------------------

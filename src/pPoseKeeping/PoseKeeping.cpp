@@ -12,6 +12,7 @@
 // 10.21experiment
 #include "XYVector.h"
 #include "ColorPack.cpp"
+#include "XYPolygon.h"
 
 #ifndef M_PI
 #define M_PI 3.1415926
@@ -86,7 +87,7 @@ bool PoseKeeping::OnNewMail(MOOSMSG_LIST &NewMail)
      if(key == "FOO") 
        cout << "great!";
 
-     else if(key == "NAV_HEADING_CPNVG") //_CPNVG
+     else if(key == "NAV_HEADING_CPNVG") //_CPNVG 11.15
      {
 	m_nav_heading = dval; 
      }
@@ -103,14 +104,14 @@ bool PoseKeeping::OnNewMail(MOOSMSG_LIST &NewMail)
      {
 	if(sval == "true")
 	{
-		m_active = true; 
+		m_active = true;
 		m_previous_time = MOOSTime();
-		postPolygons();
 	}
 	else
 	{
 		m_active = false;
-		postPolygons();
+		postPolygons(m_active); //11.15
+		ShowCompassHeading();   //11.15
 	}
      }
 
@@ -259,11 +260,11 @@ void PoseKeeping::registerVariables()
 {
   AppCastingMOOSApp::RegisterVariables();
   // Register("FOOBAR", 0);
-     //Register("NAV_HEADING", 0); //
+     //Register("NAV_HEADING", 0);
      Register("NAV_X", 0);
      Register("NAV_Y", 0);
      Register("THRUST_MODE_DIFFERENTIAL",0);
-     Register("NAV_HEADING_CPNVG");
+     Register("NAV_HEADING_CPNVG"); //11.15
 }
 
 
@@ -291,6 +292,9 @@ bool PoseKeeping::buildReport()
 
 void PoseKeeping::KeepHeading() 
 {
+	//postPolygons 11.15
+	postPolygons(m_active, true);
+
 	//Constructor
 	Data block(m_nav_heading);
 
@@ -474,6 +478,9 @@ void PoseKeeping::OutputThruster(Data block, double thrust, double speed)
 
 void PoseKeeping::SetPoint() 
 {
+	//postPolygons 11.15
+	postPolygons(m_active, false);
+
 	//Constructor
 	Data block(m_nav_heading,Distance(m_osx, m_osy, m_desired_x, m_desired_y));
 
@@ -628,28 +635,6 @@ void PoseKeeping::CheckMode(Data &block)
 }
 
 //------------------------------------------------------------
-// Procedure: postPolygons
-//   Purpose: Post KeepHeading region on pMarineViewer
-
-void PoseKeeping::postPolygons()
-{
-    string spec = "format=radial,label=destination_point,edge_color=blue,vertex_color=blue,fill_color=grey90,vertex_size=0,edge_size=1";
-    spec += ",x=" + DoubleToString(m_desired_x);
-    spec += ",y=" + DoubleToString(m_desired_y);
-    spec += ",radius=" + DoubleToString(m_tolerance_radius);
-    spec += ",pts=24, snap=1";
-    if(m_active)
-    {
-	spec += ",active=true";
-    }
-    else
-    {
-	spec += ",active=false";
-    }
-    Notify("VIEW_POLYGON", spec);
-}
-
-//------------------------------------------------------------
 // Procedure: DoubleToString
 //   Purpose: Change double to string
 string PoseKeeping::DoubleToString(double input)
@@ -683,8 +668,8 @@ void PoseKeeping::CheckValue(double &thrust_r, double &thrust_l)
 void PoseKeeping::ShowCompassHeading()
 {
 	XYVector vector(m_osx, m_osy, 5, m_nav_heading);
-	//vector.set_active(active);
-	vector.set_label("COMPASS_HEADING");
+	vector.set_active(m_active);	//11.15
+	vector.set_label("hdg"); //11.15
 	//vector.set_color("fill", "orange");
 	vector.set_vertex_size(5);
 	vector.set_edge_size(5);
@@ -694,8 +679,41 @@ void PoseKeeping::ShowCompassHeading()
 	m_Comms.Notify("VIEW_VECTOR", str);
 }
 
+//------------------------------------------------------------11.15
+// Procedure: postPolygons
+//   Purpose: Post KeepHeading region on pMarineViewer
 
+void PoseKeeping::postPolygons(bool show, bool apply_keepheading)
+{
+	string spec;
+	if(!show)
+	{
+		spec = "format=radial,label=destination";
+		spec += ",x=" + DoubleToString(m_desired_x);
+		spec += ",y=" + DoubleToString(m_desired_y);
+		spec += ",radius=" + DoubleToString(m_tolerance_radius);
+		spec += ",pts=24,snap=1,active=false";
+		Notify("VIEW_POLYGON",spec);
+		return;
+	}
 
+	if(apply_keepheading)
+	{
+		spec = "format=radial,label=destination,edge_color=blue,vertex_color=blue,fill_color=grey90,vertex_size=0,edge_size=1";
+		spec += ",x=" + DoubleToString(m_desired_x);
+		spec += ",y=" + DoubleToString(m_desired_y);
+		spec += ",radius=" + DoubleToString(m_tolerance_radius);
+		spec += ",pts=24,snap=1,active=true";
+		Notify("VIEW_POLYGON",spec);
+		return;
+	}
 
-
+	spec = "format=radial,label=destination,edge_color=red,vertex_color=blue,fill_color=grey90,vertex_size=0,edge_size=1";
+	spec += ",x=" + DoubleToString(m_desired_x);
+	spec += ",y=" + DoubleToString(m_desired_y);
+	spec += ",radius=" + DoubleToString(m_tolerance_radius);
+	spec += ",pts=24,snap=1,active=true";
+	Notify("VIEW_POLYGON",spec);
+	return;	
+}
 

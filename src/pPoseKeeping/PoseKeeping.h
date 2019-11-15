@@ -63,7 +63,6 @@ class PoseKeeping : public AppCastingMOOSApp
    double Distance(double current_x, double current_y, double destination_x, double destination_y);
    double Speed(Data &block);
    void CheckMode(Data &block);
-   void postPolygons();
    std::string DoubleToString(double input);
    //9.27experiment
    void CheckValue(double &thrust_r, double &thrust_l);
@@ -71,6 +70,8 @@ class PoseKeeping : public AppCastingMOOSApp
    //10.21experiment
    void ShowCompassHeading();
 
+   //11.15
+   void postPolygons(bool show, bool apply_keepheading = false);
 
  private: // Configuration variables
    double m_desired_heading;

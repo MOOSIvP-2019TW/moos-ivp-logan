@@ -11,12 +11,10 @@
 #include "PoseKeeping.h"
 // 10.21experiment
 #include "XYVector.h"
-#include "ColorPack.cpp"
-#include "XYPolygon.h"
 
-#ifndef M_PI
-#define M_PI 3.1415926
-#endif
+// 11.19
+#include "AngleUtils.h"
+#include "ColorPack.cpp"
 
 using namespace std;
 
@@ -272,6 +270,27 @@ void PoseKeeping::registerVariables()
 
 //------------------------------------------------------------
 // Procedure: buildReport()
+//      Note: A virtual function of the AppCastingMOOSApp superclass, 
+//            conditionally invoked if either a terminal or appcast 
+//            report is needed.
+//
+//    Desired Pose & Heading            Current Pose & Heading
+//  ----------------- ---------         -------- --------------
+//           Heading: 180                  Mode: KeepHeading
+//             (X,Y): 0,0           IMU_Heading: 134.8
+//  Tolerance radius: 5.0                 (X,Y): -4.93,-96.05   
+//                                     Distance: 50.6   
+//                                   Thrust_lft: 20
+//                                   Thrust_rgt: -60
+//
+//
+//
+//  Compare GPS & IMU Heading                   Thrust left & right
+//  --------------------------------------     ------------------------
+//        GPS Heading(NAV_HEADING): 135.7       DESIRED_THRUST_L: 20
+//  IMU Heading(NAV_HEADING_CPNVG): 150.6       DESIRED_THRUST_R:-60
+//
+// DESIRED_THRUST_R, DESIRED_THRUST_L, THRUST_MODE_DIFFERENTIAL, DISTANCE, CURR_MODE, SPEED, THRUST, POSITION, DESIRED_HEADING, NAV_HEADING, NAV_HEADING_CPNVG
 
 bool PoseKeeping::buildReport() 
 {
@@ -516,81 +535,6 @@ void PoseKeeping::SetPoint()
 	m_previous_error = block.m_curr_error;
 	m_previous_time = current_time; 
 }
-//-------------------------------------------------------------
-// Procedure: relAng
-//   Purpose: Calculate angle between destination and vehicle (from lib-geometry) 
-
-double PoseKeeping::relAng(double xa, double ya, double xb, double yb)
-{ 
-  if((xa==xb)&&(ya==yb))
-    return(0);
-
-  double w   = 0;
-  double sop = 0;
-
-  if(xa < xb) {
-    if(ya==yb)  
-      return(90.0);
-    else
-      w = 90.0;
-  }
-  else if(xa > xb) {
-    if(ya==yb)  
-      return(270.0);
-    else
-      w = 270.0;
-  }
-
-  if(ya < yb) {
-    if(xa == xb) 
-      return(0.0);
-    if(xb > xa) 
-      sop = -1.0;
-    else 
-      sop =  1.0;
-  }
-  else if(yb < ya) {
-    if(xa == xb) 
-      return(180);
-    if(xb >  xa) 
-      sop =  1.0;
-    else 
-      sop = -1.0;
-  }
-
-  double ydiff = yb-ya;
-  double xdiff = xb-xa;
-  if(ydiff<0) ydiff = ydiff * -1.0;
-  if(xdiff<0) xdiff = xdiff * -1.0;
-
-  double avalPI = atan(ydiff/xdiff);
-  double avalDG = radToDegrees(avalPI);
-  double retVal = (avalDG * sop) + w;
-
-  retVal = angle360(retVal);
-
-  return(retVal);
-}
-//---------------------------------------------------------------
-// Procedure: angle360
-//   Purpose: Convert angle to be strictly in the rang [0, 360). (from lib-geometry)
-
-double PoseKeeping::angle360(double degval)
-{
-  while(degval >= 360.0)
-    degval -= 360.0;
-  while(degval < 0.0)
-    degval += 360.0;
-  return(degval);
-}
-//---------------------------------------------------------------
-// Procedure: radToDegrees
-//   Purpose: Change rad to degree (from lib-geometry)
-
-double PoseKeeping::radToDegrees(double radval)
-{
-  return((radval / M_PI) * 180);
-}
 
 //---------------------------------------------------------------
 // Procedure: Distance
@@ -602,6 +546,7 @@ double PoseKeeping::Distance(double current_x, double current_y, double destinat
   Notify("DISTANCE",distance);
   return(distance);
 }
+
 //---------------------------------------------------------------
 // Procedure: Speed
 //   Purpose: Decide Upper and lower limit of the speed  
@@ -620,6 +565,7 @@ double PoseKeeping::Speed(Data &block)
 	}
 	return(speed);	
 }
+
 //---------------------------------------------------------------
 // Procedure: CheckMode
 //   Purpose: If the mode changed, reset PID variables

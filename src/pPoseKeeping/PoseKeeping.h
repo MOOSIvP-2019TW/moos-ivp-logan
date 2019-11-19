@@ -57,9 +57,6 @@ class PoseKeeping : public AppCastingMOOSApp
    void CalculateError(Data &block, double desired_angle);
    void OutputThruster(Data block, double thrust, double speed);
    void SetPoint();
-   double relAng(double xa, double ya, double xb, double yb);
-   double angle360(double degval);
-   double radToDegrees(double radval);
    double Distance(double current_x, double current_y, double destination_x, double destination_y);
    double Speed(Data &block);
    void CheckMode(Data &block);

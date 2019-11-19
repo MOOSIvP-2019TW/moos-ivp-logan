@@ -140,19 +140,21 @@ bool PoseKeeping::Iterate()
   AppCastingMOOSApp::Iterate();
   
   // Wait until active
-  if(!m_active)
-    return(false);
+  if(!m_active){
+    AppCastingMOOSApp::PostReport();
+    return(false);}
 
   // ShowCompassHeading on
   ShowCompassHeading();
 
-///* Filter feature
+///* Filter
   // CheckCompassHeading
   if(m_pre_heading == -1){}
   else
   {
 	if(abs(m_nav_heading - m_pre_heading) > 120 && abs(m_nav_heading - m_pre_heading) < 340) // from logfile data result
 	{
+		AppCastingMOOSApp::PostReport();
 		return(false);
 	}
   }
@@ -171,7 +173,7 @@ bool PoseKeeping::Iterate()
   else
     SetPoint();
 
-///* Filter feature
+///* Filter
   // save m_nav_heading to m_pre_heading
   m_pre_heading = m_nav_heading; 
 //*/

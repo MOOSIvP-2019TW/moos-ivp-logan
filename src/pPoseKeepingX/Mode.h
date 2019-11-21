@@ -22,53 +22,57 @@ private:
 
 public:
     // constructor & destructor
-    //Mode(/* args */) {}
+    Mode() {}
     Mode(double error){
 	m_curr_error = error;
-	cout << "Base con" << endl;
     }
-    virtual ~Mode() { cout << "Base de" << endl;}
+    virtual ~Mode() {}
     // setter
-    void seterror(double error){m_curr_error = error;}
-    void setmode(string mode){m_mode = mode;}
-    void setthrustr(double thrust){m_thrust_r = thrust;}
-    void setthrustl(double thrust){m_thrust_l = thrust;}
+    void seterror(double error)		{m_curr_error = error;}
+    void setmode(string mode)		{m_mode = mode;}
+    void setthrustr(double thrust)	{m_thrust_r = thrust;}
+    void setthrustl(double thrust)	{m_thrust_l = thrust;}
     
     // getter
-    double geterror(){return m_curr_error;}
-    string getmode(){return m_mode;}
-    double getthrustr(){return m_thrust_r;}
-    double getthrustl(){return m_thrust_l;}
+    double geterror() const	{return m_curr_error;}
+    string getmode() const	{return m_mode;}
+    double getthrustr() const	{return m_thrust_r;}
+    double getthrustl() const	{return m_thrust_l;}
 
-    // absturact functions
+    // abstract functions
     virtual void CalculateError() = 0;
     virtual void Output(double, double) = 0;
 };
 
 class Keepheading: public Mode
 {
-private:
-    /* data */
 public:
     Keepheading(double error): Mode(error) {
-        setmode("keepheading");
-	cout << "Keep con" << endl;
+        setmode("Keepheading");
     }
-    ~Keepheading() {cout << "Keep de" << endl;}
+    ~Keepheading() {}
     void CalculateError();
     void Output(double, double);
 };
 
 class Forward: public Mode
 {
-private:
-    /* data */
 public:
     Forward(double error): Mode(error) {
-        setmode("forward");
-	cout << "Forward con" << endl;
+        setmode("Forward");
     }
-    ~Forward() {cout << "Forward de" << endl;}
+    ~Forward() {}
+    void CalculateError();
+    void Output(double, double);
+};
+
+class Backward: public Mode
+{
+public:
+    Backward(double error): Mode(error) {
+        setmode("Backward");
+    }
+    ~Backward() {}
     void CalculateError();
     void Output(double, double);
 };

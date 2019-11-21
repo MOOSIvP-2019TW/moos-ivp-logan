@@ -65,6 +65,9 @@ class PoseKeepingX : public AppCastingMOOSApp
   double m_upper_speed;
   double m_lower_speed;
 
+  // smart pointer test
+  std::unique_ptr<Mode> p;
+
 };
 
 #endif

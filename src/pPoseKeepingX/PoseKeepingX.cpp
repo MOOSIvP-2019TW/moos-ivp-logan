@@ -29,7 +29,7 @@ PoseKeepingX::PoseKeepingX()
   m_desired_heading = 0;
   m_active = false;
   m_keep_heading = false;
-  m_arrival_radius = 10;
+  m_arrival_radius = 5;
   m_tolerance_radius = 0;
 
   m_previous_time = 0;
@@ -156,7 +156,7 @@ bool PoseKeepingX::Iterate()
     AppCastingMOOSApp::PostReport();
     return(true);}
 
-  // Config
+  // Calculate Params for deciding mode
   double distance = Distance(m_osx, m_osy, m_desired_x, m_desired_y);
   double keepheading_error = m_desired_heading - m_nav_heading;
   double setpoint_error = relAng(m_osx, m_osy, m_desired_x, m_desired_y) - m_nav_heading;
@@ -164,39 +164,25 @@ bool PoseKeepingX::Iterate()
   // Behavior
   if(distance < m_arrival_radius){
     m_keep_heading = true;}
-  // If vehicle outside KeepHeading region, KeepHeading mode Off (will become SetPoint mode)
+  // If vehicle outside Keepheading region, Keepheading mode Off (will become Forward or Backward mode)
   if(distance > m_tolerance_radius){
     m_keep_heading = false;}
 
-/* smart pointer
   // Decide Mode
-  unique_ptr<Mode> p;
   if(m_keep_heading)
    p.reset(new Keepheading(keepheading_error));
   else if((setpoint_error < 180 && setpoint_error > 90 || setpoint_error < -90 && setpoint_error > -180) && distance < m_tolerance_radius+10)
-   p.reset(new Forward(setpoint_error));
+   p.reset(new Backward(setpoint_error));
   else
    p.reset(new Forward(setpoint_error));
-*/
 
-///* normal pointer
-  //Decide Mode
-  Mode* p = nullptr;
-  if(m_keep_heading)
-   p = new Keepheading(keepheading_error);
-  else if((setpoint_error < 180 && setpoint_error > 90 || setpoint_error < -90 && setpoint_error > -180) && distance < m_tolerance_radius+10)
-   p = new Forward(setpoint_error);
-  else
-   p = new Forward(setpoint_error);
-//*/
-
-  // Go go!
+  //Calculate error for PID
   p->CalculateError();
-  //CheckMode(p.get()); //smart pointer
-  CheckMode(p);         //normal pointer
+  CheckMode(p.get());
 
   double curr_time = MOOSTime();
   double delta_time = curr_time - m_previous_time;
+  m_steady_error = m_steady_error + p->geterror()*delta_time;
 
   double thrust = m_kp*(p->geterror()) + m_kd*((p->geterror() - m_previous_error)/delta_time) + m_ki*m_steady_error;
   double speed = m_kp*distance;
@@ -210,8 +196,6 @@ bool PoseKeepingX::Iterate()
   m_previous_error = p->geterror();
   m_previous_time = curr_time;
 
-  //normal pointer release
-  delete p;
 
   PublishFreshMOOSVariables();
 
@@ -317,7 +301,11 @@ bool PoseKeepingX::buildReport()
   actab << "Alpha | Bravo | Charlie | Delta";
   actab.addHeaderLines();
   actab << "one" << "two" << "three" << "four";
-  m_msgs << actab.getFormattedString();
+  m_msgs << actab.getFormattedString() << endl;
+  m_msgs <<  "Mode: " << p->getmode() << endl;
+  //m_msgs <<  "Present Buoyancy rate: " << buoy_rate_now << endl;
+  //m_msgs <<  "Present Buoyancy rate: " << buoy_rate_now << endl;
+  //m_msgs <<  "Present Buoyancy rate: " << buoy_rate_now << endl;
 
   return(true);
 }
@@ -340,7 +328,6 @@ void PoseKeepingX::CheckMode(Mode* ptr)
 {
 	if(ptr->getmode() != m_switch_mode)
 	{
-		m_previous_time = MOOSTime();
 		m_previous_error = 0;
 		m_steady_error = 0;
 		m_switch_mode = ptr->getmode();

@@ -270,28 +270,6 @@ void PoseKeeping::registerVariables()
 
 //------------------------------------------------------------
 // Procedure: buildReport()
-//      Note: A virtual function of the AppCastingMOOSApp superclass, 
-//            conditionally invoked if either a terminal or appcast 
-//            report is needed.
-//
-//    Desired Pose & Heading            Current Pose & Heading
-//  ----------------- ---------         -------- --------------
-//           Heading: 180                  Mode: KeepHeading
-//             (X,Y): 0,0           IMU_Heading: 134.8
-//  Tolerance radius: 5.0                 (X,Y): -4.93,-96.05   
-//                                     Distance: 50.6   
-//                                   Thrust_lft: 20
-//                                   Thrust_rgt: -60
-//
-//
-//
-//  Compare GPS & IMU Heading                   Thrust left & right
-//  --------------------------------------     ------------------------
-//        GPS Heading(NAV_HEADING): 135.7       DESIRED_THRUST_L: 20
-//  IMU Heading(NAV_HEADING_CPNVG): 150.6       DESIRED_THRUST_R:-60
-//
-// DESIRED_THRUST_R, DESIRED_THRUST_L, THRUST_MODE_DIFFERENTIAL, DISTANCE, CURR_MODE, SPEED, THRUST, POSITION, DESIRED_HEADING, NAV_HEADING, NAV_HEADING_CPNVG
-
 bool PoseKeeping::buildReport() 
 {
   m_msgs << "============================================" << endl;
@@ -574,11 +552,11 @@ void PoseKeeping::CheckMode(Data &block)
 {
 	if(block.m_mode != m_switch_mode)
 	{
-		m_previous_time = MOOSTime();
+		//m_previous_time = MOOSTime();
 		m_previous_error = 0;
 		m_steady_error = 0;
 		m_switch_mode = block.m_mode;
-		Notify("MODE",m_switch_mode);
+		//Notify("MODE",m_switch_mode);
 	}
 }
 

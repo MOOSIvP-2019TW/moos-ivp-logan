@@ -37,7 +37,7 @@ In USM_MOOSAPP.cpp:Iterate()
                                                                 propagateNodeRecord(m_record, delta_time, false, false) ---
                                                                /                                                          |
                                                               /                                                           | 
-                                    if(m_dual_state == ture)--                                                            |--- for Case 1,2,3,4
+                                    if(m_dual_state == ture)--                                                            |--- for Case 5,6,7,8
                                    /                          \                                                           |
                                   /                            \                                                          |
                                  /                              propagateNodeRecord(m_record_gt, delta_time, true, true)---
@@ -45,7 +45,7 @@ m_model.propagate(m_curr_time) --
                                  \   
                                   \    
                                    \                
-                                    else -- propagateNodeRecord(m_record, delta_time, true, true) --------------------------- for Case 5,6,7,8
+                                    else -- propagateNodeRecord(m_record, delta_time, true, true) --------------------------- for Case 1,2,3,4
 
 =================================================================================================================================================
 
@@ -61,7 +61,7 @@ In USM_MOOSAPP.cpp:Iterate()
     /
    /
   /
--------else if(m_dual_state = false && m_wring_heading_mode == ture && m_drift)  ---- for Case 6
+-------else if(m_dual_state = false && m_wring_heading_mode == ture && m_drift == false)  ---- for Case 6
   \       postNodeRecordUpdate(m_sim_prefix+"_GT", record_gt)
    \      postNodeRecordUpdate_wrong_heading_state(m_sim_prefix, record, record_gt)
     \

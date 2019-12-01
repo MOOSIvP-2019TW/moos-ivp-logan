@@ -911,6 +911,9 @@ void USM_MOOSApp::postNodeRecordUpdate_wrong_heading_state(string prefix,
   Notify(prefix+"_HEADING", record.getHeading());              // Hi Mike, I have a question here! If I notify record.getHeading() without giving m_curr_time, Case 6 mode will work perfectly
   Notify(prefix+"_DEPTH", record_gt.getDepth(), m_curr_time);  // But if I notify record.getHeading() with m_curr_time, like "Notify(prefix+"_HEADING", record.getHeading(), m_curr_time);",
                                                                // the result will be different. I've been thinking for a while but still can't figure out. 
+  cout << setprecision(10)  << "MOOSTime " << MOOSTime() << endl;
+  cout << setprecision(10) <<  "m_curr_time " << m_curr_time << endl;
+
 
   // Added by HS 120124 to make it work ok with iHuxley
   Notify("SIMULATION_MODE","TRUE", m_curr_time);

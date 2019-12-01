@@ -18,7 +18,7 @@ ProcessConfig = ANTLER
   MSBetweenLaunches = 200
 
   Run = MOOSDB          @ NewConsole = false
-  Run = uSimMarineX_HWGR@ NewConsole = false
+  Run = uSimMarineX_HWGR@ NewConsole = true
   Run = pNodeReporter   @ NewConsole = false
   Run = pMarinePID      @ NewConsole = false
   Run = pMarineViewer   @ NewConsole = false
